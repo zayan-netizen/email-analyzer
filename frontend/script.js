@@ -12,6 +12,7 @@ button.addEventListener("click", async () => {
 	}
 
 	const formData = new FormData();
+
 	formData.append("file", file);
 
 	const response = await fetch("http://127.0.0.1:8000/analyze", {
@@ -23,8 +24,64 @@ button.addEventListener("click", async () => {
 
 	console.log(data);
 
-	alert(`
-		File: ${data.filename}
-		Size: ${data.size_in_bytes} bytes
-	`);
-})
+	displayResults(data);
+});
+
+function displayResults(data){
+
+	const resultDiv = document.getElementById("results")
+
+	let riskClass = "";
+
+	if(data.classification == "SAFE"){
+		riskClass = "SAFE";
+	}
+	else if(data.classification == "SUSPICIOUS"){
+		riskClass = "SUSPICIOUS";
+	} else {
+		riskClass = "DANGEROUS"
+	}
+
+	html = `
+		<h2 class="${riskClass}">
+			${data.classification}
+		</h2>
+
+		<p><strong>Risk Score:</strong>${data.risk_score}</p>
+
+		<p><strong>From:</strong>${data.from}</p>
+
+		<p><strong>Subject:</strong>${data.subject}</p>
+
+		<h3>Detected URLS:</h3>
+	`;
+
+	data.url_analysis.forEach(item => {
+
+		html += `
+			<div class="url-card">
+
+				<p>
+					<strong>URL:</strong>
+					${item.url}
+				</p>
+
+			<ul>
+			`;
+
+		item.findings.forEach(finding => {
+
+			html += `
+				<li>${finding}</li>
+			`;
+		});
+
+		html += `
+				</ul>
+
+			</div>
+			`;
+	});
+
+	resultDiv.innerHTML = html;
+}

@@ -1,0 +1,53 @@
+body{
+	font-family: Arial, sans-serif;
+	background-color: #111827;
+	color: white;
+	margin: 0;
+	padding: 0;
+}
+
+.container{
+	width: 80%;
+	margin: auto;
+	padding: 30px;
+}
+
+h1{
+	color: #60a5fa;
+}
+
+button{
+	padding: 10px, 20px;
+	margin-top: 10px;
+	cursor: pointer;
+}
+
+#results{
+	margin-top: 30px;
+	padding: 20px;
+	background-color: #1f2937;
+	border-radius: 10px;
+}
+
+.safe{
+	color: #22c55e;
+}
+
+.suspicious{
+	color: #facc15;
+}
+
+.dangerous{
+	color: #ef4444;
+}
+
+.url-card{
+	background-color: #374151;
+	padding: 15px;
+	margin-top: 15px;
+	border-radius: 8px;
+}
+
+
+
+

@@ -22,7 +22,7 @@ def calculate_risk_score(url_analysis):
 def classify_risk(score):
 
 	if score >= 70:
-		return "Dangerous"
+		return "DANGEROUS"
 
 	elif score >= 30:
 		return "SUSPICIOUS"
