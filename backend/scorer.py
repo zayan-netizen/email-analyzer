@@ -1,4 +1,4 @@
-def calculate_risk_score(url_analysis, header_findings):
+def calculate_risk_score(url_analysis, header_findings, attachment_findings):
 
 	score = 0
 
@@ -27,6 +27,18 @@ def calculate_risk_score(url_analysis, header_findings):
 
 		elif "Suspicious domain keyword" in finding.lower():
 			score += 20
+
+	for finding in attachment_findings:
+
+		if "Dangerous attachment type" in finding:
+			score += 40
+
+		elif "Macro-enabled" in finding:
+			score += 35
+
+		elif "double-extension" in finding:
+			score += 30
+
 
 	return score
 

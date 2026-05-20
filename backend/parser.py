@@ -116,6 +116,48 @@ def analyse_header(msg):
 
 	return findings
 
+def analyse_attachments(msg):
+
+	findings = []
+
+	dangerous_extensions = [".js", ".exe", ".bat", ".vbs", ".scr"]
+
+	macro_extensions = [".docm", ".xlsm", ".pptm"]
+
+	attachments = []
+
+	for part in msg.walk():
+
+		filename = part.get_filename()
+
+		if filename:
+
+			attachment_findings = []
+
+			lower_filename = filename.lower()
+
+			for ext in dangerous_extensions:
+				if lower_filename.endswith(ext):
+					attachment_findings.append(f"Dangerous attachment type: {ext}")
+
+			for ext in macro_extensions:
+				if lower_filename.endswith(ext):
+					attachment_findings.append(f"Macro-enabled document: {ext}")
+
+			split_name = lower_filename.split(".")
+
+			if len(split_name) >= 3:
+				attachment_findings.append("Possible double-extension attachment")
+
+			attachments.append({
+								"filename": filename,
+								"attachment_findings": attachment_findings
+							})
+
+			findings.extend(attachment_findings)
+
+	return attachments, findings
+
 def parse_email(file_content):
 
 	msg = BytesParser(policy=policy.default).parsebytes(file_content)
@@ -125,6 +167,8 @@ def parse_email(file_content):
 	urls = extract_url(body)
 
 	header_findings = analyse_header(msg)
+
+	attachments, attachment_findings = analyse_attachments(msg)
 
 	url_analysis = []
 
@@ -144,9 +188,10 @@ def parse_email(file_content):
 		"date": msg["date"],
 		"body": body,
 		"header_findings": header_findings,
-		"url_analysis": url_analysis
-
-	}
+		"url_analysis": url_analysis,
+		"attachments": attachments,
+		"attachment_findings": attachment_findings
+		}
 
 	return email_data
 

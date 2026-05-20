@@ -4,7 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.parser import parse_email
 from backend.scorer import calculate_risk_score, classify_risk
 
+from backend.database import create_table, save_report
+
 app = FastAPI()
+
+create_table()
 
 app.add_middleware(
 	CORSMiddleware,
@@ -27,11 +31,18 @@ async def analyse_email(file: UploadFile = File(...)):
 
 	parsed_email = parse_email(content)
 
-	score = calculate_risk_score(parsed_email["url_analysis"], parsed_email["header_findings"])
+	score = calculate_risk_score(parsed_email["url_analysis"], parsed_email["header_findings"], parsed_email["attachment_findings"])
 
 	classification = classify_risk(score)
 
 	parsed_email["risk_score"] = score
 	parsed_email["classification"] = classification
+
+	save_report(
+    parsed_email["from"],
+    parsed_email["subject"],
+    score,
+    classification
+	)
 
 	return parsed_email
