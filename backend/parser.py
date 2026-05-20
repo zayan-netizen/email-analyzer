@@ -6,9 +6,11 @@ from email.parser import BytesParser
 from urllib.parse import urlparse
 import ipaddress
 
+from email.utils import parseaddr
+
 def extract_url(text):
 
-	url_pattern = 'https?://[^\s]+'
+	url_pattern = r'https?://[^\s]+'
 
 	urls = re.findall(url_pattern, text)
 
@@ -68,6 +70,52 @@ def analyse_urls(url):
 
 	return findings
 
+def analyse_header(msg):
+
+	findings = []
+
+	sender = msg["from"]
+	reply_to = msg["reply-to"]
+
+	free_email_domains = [
+							"google.com",
+							"yahoo.com",
+							"outlook.com",
+							"gmail.com"
+						]
+
+	suspicious_keywords = [
+							"support",
+							"security",
+							"verify",
+							"update"
+							]
+
+	sender_email = parseaddr(sender)[1]
+
+	sender_domain = ""
+
+	if "@" in sender_email:
+		sender_domain = sender_email.split("@")[1]
+
+	if sender_domain in free_email_domains:
+
+		findings.append("Uses Free Email Provider")
+
+	for keyword in suspicious_keywords:
+		if keyword in sender_email:
+			findings.append(f"Suspicious domain keyword: {keyword}")
+
+	if reply_to:
+
+		reply_email = parseaddr(reply_to)[1]
+
+		if sender_email != reply_email:
+
+			findings.append("Reply-to differs from sender-email")
+
+	return findings
+
 def parse_email(file_content):
 
 	msg = BytesParser(policy=policy.default).parsebytes(file_content)
@@ -75,6 +123,8 @@ def parse_email(file_content):
 	body = get_email_body(msg)
 
 	urls = extract_url(body)
+
+	header_findings = analyse_header(msg)
 
 	url_analysis = []
 
@@ -93,7 +143,10 @@ def parse_email(file_content):
 		"subject": msg["subject"],
 		"date": msg["date"],
 		"body": body,
+		"header_findings": header_findings,
 		"url_analysis": url_analysis
+
 	}
 
 	return email_data
+

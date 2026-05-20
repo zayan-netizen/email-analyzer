@@ -1,4 +1,4 @@
-def calculate_risk_score(url_analysis):
+def calculate_risk_score(url_analysis, header_findings):
 
 	score = 0
 
@@ -17,7 +17,18 @@ def calculate_risk_score(url_analysis):
 			elif "suspicious keyword" in finding:
 				score += 10
 
-		return score
+	for finding in header_findings:
+
+		if "Free Email Provider" in finding.lower():
+			score += 15
+
+		elif "Reply-to differs" in finding.lower():
+			score += 25
+
+		elif "Suspicious domain keyword" in finding.lower():
+			score += 20
+
+	return score
 
 def classify_risk(score):
 

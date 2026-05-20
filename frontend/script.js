@@ -42,7 +42,7 @@ function displayResults(data){
 		riskClass = "DANGEROUS"
 	}
 
-	html = `
+	let html = `
 		<h2 class="${riskClass}">
 			${data.classification}
 		</h2>

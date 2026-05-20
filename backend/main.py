@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.parser import parse_email
 from backend.scorer import calculate_risk_score, classify_risk
+
 app = FastAPI()
 
 app.add_middleware(
@@ -26,7 +27,7 @@ async def analyse_email(file: UploadFile = File(...)):
 
 	parsed_email = parse_email(content)
 
-	score = calculate_risk_score(parsed_email["url_analysis"])
+	score = calculate_risk_score(parsed_email["url_analysis"], parsed_email["header_findings"])
 
 	classification = classify_risk(score)
 
